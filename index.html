@@ -1,0 +1,62 @@
+<html>
+	<head>
+		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript">
+		
+			var socket = io.connect('http://104.131.210.180:8081/');
+			var canvas; 
+			var context; 
+			var opx = 0;
+			var opy = 0;
+
+			socket.on('connect', function() {
+				console.log("Connected");
+			});
+			
+			function init() {
+				canvas = document.getElementById('myCanvas');
+				context = canvas.getContext('2d');
+				context.fillStyle="#FF0000";
+				context.fillRect(0,0,canvas.width,canvas.height);
+				
+				canvas.addEventListener('mousemove', function(evt){
+					console.log(evt);
+					context.lineTo(evt.clientX, evt.clientY);
+					context.stroke();
+					var drawingobj = {x: evt.clientX, y:evt.clientY};
+
+					socket.emit('mousemove', drawingobj )
+				});
+			}
+
+			
+
+			// Receive from any event
+			socket.on('mousemove', function (evt) {
+				console.log(evt);
+				context.beginPath();
+				context.strokeStyle='#000000';
+				context.moveTo(opx,opy);
+				context.lineTo(evt.clientX, evt.clientY);
+				context.stroke();
+
+				opx = evt.clientX;
+				opy = evt.clientY;
+			});
+			
+			// var sendmessage = function(message) {
+			// 	console.log("chatmessage: " + message);
+			// 	socket.emit('chatmessage', message);
+			// };
+
+
+			
+
+			window.addEventListener('load', init);
+		</script>	
+	</head>
+ <body>
+	 <canvas width="600" height="600" id="myCanvas" />
+ </body>
+</html>
+	
